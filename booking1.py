@@ -43,7 +43,7 @@ class BookingSpider(scrapy.Spider):
                                                     
                         "scores" : hotel.xpath('div[1]/div[2]/div/div/div[2]/div[1]/a/span/div/div[1]/text()').get(),
                                         
-                        "urls" : hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/@href').get(),
+                        "urls" : hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/@href').get().split("aid")[0],
                     
                         "text_description" : hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[3]/text()').get()
                                                 
@@ -60,7 +60,7 @@ class BookingSpider(scrapy.Spider):
                                                     
                         "scores" : hotel.xpath('div[1]/div[2]/div/div/div[2]/div[1]/a/span/div/div[1]/text()').get(),
                                         
-                        "urls" : hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/@href').get(),
+                        "urls" : hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/@href').get().split("aid")[0],
                     
                         "text_description" : hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[4]/text()').get()
                                                 
@@ -70,7 +70,7 @@ class BookingSpider(scrapy.Spider):
 
         
 # Name of the file where the results will be saved
-filename = "booking_2.json"
+filename = "booking.json"
 
 # If file already exists, delete it before crawling (because Scrapy will concatenate the last and new results otherwise)
 if filename in os.listdir('src/'):
