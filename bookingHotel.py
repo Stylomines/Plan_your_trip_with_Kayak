@@ -16,13 +16,12 @@ class BookingHotelSpider(scrapy.Spider):
     name = "bookinghotel"
 
     # Starting URL
-    start_urls = list_urls[0:2]
-    
-    
+    start_urls = list_urls
+      
     
     def parse(self, response):
 
-        split_url = response.url.split("ss=") 
+        # selects the url of each hotel
 
         hotels = response.xpath('//*[@id="search_results_table"]/div[2]/div/div/div/div[3]/div')
 
@@ -30,24 +29,28 @@ class BookingHotelSpider(scrapy.Spider):
 
             if hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a/div[1]/text()').get() != None :
 
-                next_hotel=  hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/@href').get().split("aid")[0]
+                url_hotel=  hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/@href').get().split("aid")[0]
                
-                yield response.follow(next_hotel, callback=self.hotel_booking)
+                yield response.follow(url_hotel, callback=self.hotel_booking)
 
 
     def hotel_booking(self, response):
 
+        # It will get urls, name_hotels, scores, coordinates, text_description
+
         yield {
 
-            'urls' : response,
-                        
-            'name_hotels' : response.xpath('//*[@id="hp_hotel_name"]/div/div/h2/text()').get(),
+            'url' : response.url,
 
-            'scores' :  response.xpath('//*[@id="js--hp-gallery-scorecard"]/a/div/div/div/div/div[1]/text()').get(),     
+            'city' : response.xpath('//*[@id="ss"]/@value').get(),
+                        
+            'name_hotel' : response.xpath('//*[@id="hp_hotel_name"]/div/div/h2/text()').get(),
+
+            'score' :  response.xpath('//*[@id="js--hp-gallery-scorecard"]/a/div/div/div/div/div[1]/text()').get(),     
 
             'coordinates': response.xpath('//*[@id="showMap2"]/span/@data-bbox').get(),
 
-            "text_description2" : response.xpath('//*[@id="property_description_content"]/p/text()').getall()
+            "text_description" : response.xpath('//*[@id="property_description_content"]/p/text()').getall()
             
         }
         
