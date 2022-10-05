@@ -45,8 +45,10 @@ class BookingSpider(scrapy.Spider):
                                         
                         "urls" : hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/@href').get().split("aid")[0],
                     
-                        "text_description" : hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[3]/text()').get()
-                                                
+                        "text_description" : hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[3]/text()').get(),
+
+
+                        "location" : hotel.xpath('/div[1]/div[2]/div/div/div[1]/div/div[2]/div/text()').get()                
                                                                                                         
                     }
 
@@ -70,7 +72,7 @@ class BookingSpider(scrapy.Spider):
 
         
 # Name of the file where the results will be saved
-filename = "booking.json"
+filename = "booking_test.csv"
 
 # If file already exists, delete it before crawling (because Scrapy will concatenate the last and new results otherwise)
 if filename in os.listdir('src/'):
@@ -81,7 +83,7 @@ process = CrawlerProcess(settings = {
     'USER_AGENT': 'Chrome/97.0',
     'LOG_LEVEL': logging.INFO,
     "FEEDS": {
-        'src/' + filename: {"format": "json"},
+        'src/' + filename: {"format": "csv"},
     }
 })
 
