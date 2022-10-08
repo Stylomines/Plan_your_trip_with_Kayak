@@ -6,7 +6,7 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 
 
-df = pd.read_csv("cities.csv")
+df = pd.read_csv("cities_weather.csv")
 
 
 list_urls = ["https://www.booking.com/searchresults.fr.html?ss=" +  city for city in df["City"]]
@@ -16,7 +16,7 @@ class BookingHotelSpider(scrapy.Spider):
     name = "bookinghotel"
 
     # Starting URL
-    start_urls = list_urls
+    start_urls = list_urls[0:2]
       
     
     def parse(self, response):
@@ -24,6 +24,13 @@ class BookingHotelSpider(scrapy.Spider):
         # selects the url of each hotel
 
         hotels = response.xpath('//*[@id="search_results_table"]/div[2]/div/div/div/div[3]/div')
+        # city2 =  response.xpath('//*[@id="__bui-c377227-1"]/input/@value').get()
+        
+
+        city =  response.xpath('//*[@id="right"]/div[1]/div/div/div/h1/text()').get().split(":")[0]
+   
+        
+        
 
         for hotel in hotels:
 
@@ -31,7 +38,7 @@ class BookingHotelSpider(scrapy.Spider):
 
                 url_hotel=  hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/@href').get().split("aid")[0]
                
-                yield response.follow(url_hotel, callback=self.hotel_booking)
+                yield response.follow(url_hotel, callback=self.hotel_booking, meta = {"city" : city})
 
 
     def hotel_booking(self, response):
@@ -41,21 +48,17 @@ class BookingHotelSpider(scrapy.Spider):
         yield {
 
             'url' : response.url,
-
             'city' : response.xpath('//*[@id="ss"]/@value').get(),
-                        
+            'city2' : response.meta["city"],             
             'name_hotel' : response.xpath('//*[@id="hp_hotel_name"]/div/div/h2/text()').get(),
-
-            'score' :  response.xpath('//*[@id="js--hp-gallery-scorecard"]/a/div/div/div/div/div[1]/text()').get(),     
-
+            'score' :  response.xpath('//*[@id="js--hp-gallery-scorecard"]/a/div/div/div/div/div[1]/text()').get(),
             'coordinates': response.xpath('//*[@id="showMap2"]/span/@data-bbox').get(),
-
             "text_description" : response.xpath('//*[@id="property_description_content"]/p/text()').getall()
             
         }
         
 # Name of the file where the results will be saved
-filename = "booking_hotel.json"
+filename = "booking_hotel2.json"
 
 # If file already exists, delete it before crawling (because Scrapy will concatenate the last and new results otherwise)
 if filename in os.listdir('src/'):
